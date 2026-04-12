@@ -167,7 +167,7 @@ Download the `HTMLDashboardGeneratorV2.yaml` file from this repository to your l
 2. Click **Manage plugins** at the top of the sources panel.
 3. In the plugin management page, click **Add plugin**.
 4. Select **Security Copilot Plugin** as the plugin type.
-5. Choose **Upload a file** and select the `HTMLDashboardGeneratorV2.yaml` file you downloaded.
+5. Choose **Upload a file** and select the [`HTMLDashboardGeneratorV2.yaml`](https://github.com/the-sentinental-guy/YashureSecurity/blob/main/HTML%20Dashboard%20Generator/Manifest.yaml) file you downloaded.
 6. Click **Add** to upload the manifest.
 
 ### Step 4 — Enable the Plugin
@@ -190,11 +190,15 @@ The plugin is designed to be **auto-selected** by the Security Copilot orchestra
 ```
 Create an HTML dashboard for this session
 ```
+<img width="722" height="685" alt="image" src="https://github.com/user-attachments/assets/0ae6d0d2-5d00-4515-91a6-1f7e479aec2a" />
+
 
 **After an incident investigation:**
 ```
 Generate an HTML report of these findings
 ```
+<img width="2912" height="3528" alt="Defender Incident 13 Dashboard" src="https://github.com/user-attachments/assets/0f680467-73c9-4aae-af33-50d6743f369c" />
+
 
 **After a threat intelligence session:**
 ```
