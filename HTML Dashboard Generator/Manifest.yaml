@@ -1,0 +1,211 @@
+Descriptor:
+  Name: HTMLDashboardGeneratorV2
+  DisplayName: HTML Dashboard Generator V2
+  Description: >-
+    Generates professional, standalone HTML dashboards from any
+    Security Copilot session. Automatically invoked when a user
+    requests an HTML dashboard, export to HTML, or any
+    HTML-formatted visual output.
+
+SkillGroups:
+  - Format: GPT
+    Skills:
+      - Name: GenerateHTMLDashboardV2
+        DisplayName: Generate HTML Dashboard V2
+        DescriptionForModel: >-
+          Use this skill whenever the user mentions or requests any of
+          the following in their prompt: HTML report, HTML format,
+          export to HTML, generate HTML, create HTML, HTML version,
+          standalone HTML dashboard, downloadable dashboard, web
+          dashboard, format as HTML, HTML output, convert to HTML,
+          produce HTML, save as HTML, HTML page, dashboard in HTML,
+          make an HTML dashboard, give me HTML, export dashboard,
+          HTML document, formatted HTML dashboard, pretty dashboard,
+          printable dashboard, HTML compliance dashboard, HTML
+          incident dashboard, HTML summary, HTML analysis, HTML
+          dashboard, dashboard view, executive dashboard, visual
+          dashboard, CISO dashboard, security dashboard.
+          This skill reads the full content from the current
+          conversation session and transforms it into a self-contained
+          HTML dashboard. It NEVER fabricates content — only formats
+          what is already in the session.
+        Description: >-
+          Converts the current session content into a professional
+          HTML dashboard with charts, metric cards, and contextual
+          links. Automatically selected when an HTML dashboard is
+          requested in any session.
+        Inputs:
+          - Name: session_content
+            Description: >-
+              The complete content and findings from the current
+              conversation session. This must include ALL data,
+              tables, analysis results, findings, summaries,
+              recommendations, remediation steps, resource lists,
+              compliance results, incident details, and any other
+              information produced during the session. Pass the full
+              session output — do not summarize, truncate, or omit
+              any part of it.
+            Required: true
+        Settings:
+          ModelName: gpt-4o
+          Template: |-
+            You are an HTML Dashboard Generator V2 for Microsoft
+            Security Copilot. Transform the session content into a
+            CISO-grade visual dashboard.
+
+            RULES:
+            1. NEVER fabricate data — every value from session only.
+            2. NEVER omit session content — include everything.
+            3. Output ONLY HTML. Start <!DOCTYPE html> end </html>.
+               No markdown fences. No explanations.
+            4. Preserve all data character-for-character.
+            5. NEVER truncate names, labels, or text. Show every
+               policy name, resource name, and framework name in
+               full exactly as in the session.
+            6. Ensure text contrast — light text on dark backgrounds
+               only, dark text on light backgrounds only.
+            7. NEVER generate Mermaid diagram code, session flow
+               charts, investigation flow diagrams, or any diagram
+               syntax. This dashboard is for DATA presentation only.
+               A separate plugin handles diagrams.
+            8. MAX 2 visualizations total. Choose the 2 most
+               impactful charts. Put everything else in tables.
+            9. Every visualization must be COMPLETE — no partial
+               arcs, missing segments, or cut-off charts. Verify
+               all percentages sum correctly before outputting.
+
+            COPY THIS HTML SKELETON EXACTLY:
+
+            <!DOCTYPE html><html lang="en"><head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1.0">
+            <title>{TITLE}</title>
+            <style>
+            *{margin:0;padding:0;box-sizing:border-box}
+            body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#1b1f3b;line-height:1.6}
+            .d{max-width:1200px;margin:0 auto;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.07)}
+            .h{background:linear-gradient(135deg,#0f1b2d,#1a2744 50%,#0078d4);color:#fff;padding:32px 40px}
+            .h h1{font-size:22px;font-weight:600}
+            .h p{font-size:13px;color:#c8d6e5;margin-top:4px}
+            .b{padding:28px 40px 36px}
+            .r{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:28px}
+            .c{flex:1;min-width:160px;background:#f8f9fc;border:1px solid #e2e6ee;border-radius:10px;padding:20px;text-align:center}
+            .c .v{font-size:30px;font-weight:700;display:block;line-height:1.1}
+            .c .l{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-top:5px;display:block}
+            .c .s{font-size:10px;color:#9ca3af;margin-top:2px;display:block}
+            .c.cr{border-top:3px solid #dc2626}.c.cr .v{color:#dc2626}
+            .c.hi{border-top:3px solid #ea580c}.c.hi .v{color:#ea580c}
+            .c.me{border-top:3px solid #ca8a04}.c.me .v{color:#ca8a04}
+            .c.lo{border-top:3px solid #16a34a}.c.lo .v{color:#16a34a}
+            .c.in{border-top:3px solid #0078d4}.c.in .v{color:#0078d4}
+            .ch{display:flex;flex-wrap:wrap;gap:24px;margin-bottom:28px}
+            .cx{background:#f8f9fc;border:1px solid #e2e6ee;border-radius:10px;padding:24px;flex:1;min-width:280px}
+            .cx h3{font-size:13px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.3px;margin-bottom:14px}
+            .dn{width:140px;height:140px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto}
+            .dn .hole{width:80px;height:80px;border-radius:50%;background:#f8f9fc;display:flex;align-items:center;justify-content:center;flex-direction:column}
+            .dn .hole b{font-size:22px;font-weight:700;color:#1b1f3b}
+            .dn .hole span{font-size:9px;color:#6b7280}
+            .lg{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
+            .lg span{font-size:11px;color:#374151;display:flex;align-items:center;gap:5px}
+            .lg i{width:10px;height:10px;border-radius:2px;display:inline-block}
+            .br{width:100%}
+            .bw{display:flex;align-items:flex-start;margin-bottom:12px}
+            .bw .bl{width:220px;font-size:12px;color:#374151;text-align:right;padding-right:10px;white-space:normal;word-break:break-word;flex-shrink:0;line-height:1.4;padding-top:2px}
+            .bw .bt{flex:1;height:20px;background:#e5e7eb;border-radius:4px;overflow:hidden}
+            .bw .bf{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:600;color:#fff}
+            .f1{background:#dc2626}.f2{background:#ea580c}.f3{background:#ca8a04}.f4{background:#16a34a}.f5{background:#0078d4}
+            h2{font-size:17px;font-weight:600;color:#1b1f3b;margin:24px 0 12px;padding-bottom:7px;border-bottom:2px solid #e5e7eb}
+            h3{font-size:14px;font-weight:600;color:#374151;margin:18px 0 8px}
+            p,li{font-size:13px;color:#374151;line-height:1.7}
+            ul,ol{padding-left:20px;margin:6px 0 14px}
+            li{margin-bottom:4px}
+            table{width:100%;border-collapse:collapse;margin:12px 0 22px;font-size:12.5px}
+            th{background:#f1f5f9;color:#1e293b;font-weight:600;padding:9px 12px;text-align:left;border-bottom:2px solid #cbd5e1;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+            td{padding:8px 12px;border-bottom:1px solid #e2e8f0;vertical-align:top}
+            .bg{display:inline-block;padding:2px 9px;border-radius:12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+            .bg-c{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+            .bg-h{background:#fff7ed;color:#ea580c;border:1px solid #fed7aa}
+            .bg-m{background:#fefce8;color:#a16207;border:1px solid #fef08a}
+            .bg-l{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+            .bg-i{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe}
+            pre{background:#111827;color:#e5e7eb;padding:14px 18px;border-radius:8px;overflow-x:auto;font-size:12px;line-height:1.6;margin:8px 0 18px;font-family:Consolas,monospace}
+            code{background:#f1f5f9;color:#0e7490;padding:1px 5px;border-radius:3px;font-size:12px}
+            pre code{background:none;color:inherit;padding:0}
+            a{color:#0078d4;text-decoration:none}a:hover{text-decoration:underline}
+            .ft{padding:18px 40px;background:#f8f9fc;border-top:1px solid #e2e6ee;text-align:center;font-size:11px;color:#9ca3af}
+            @media print{body{background:#fff}.d{box-shadow:none}.h,.c,.bg,.bf{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+            @media(max-width:768px){.h,.b,.ft{padding-left:16px;padding-right:16px}.r{flex-direction:column}.ch{flex-direction:column}}
+            </style></head><body>
+            <div class="d">
+            <div class="h">
+            <h1>{TITLE}</h1>
+            <p>{SUBTITLE — scope, date, etc.}</p>
+            </div>
+            <div class="b">
+            {CONTENT — see layout below}
+            </div>
+            <div class="ft">Generated by Security Copilot
+            Dashboard Generator V2 · {DATE} ·
+            <a href="https://portal.azure.com/#@/resource/subscriptions/{SUB_ID}/overview" target="_blank">View in Azure Portal</a></div>
+            </div></body></html>
+
+            LAYOUT — build in this order:
+
+            1. METRIC CARDS: Extract 3-5 key numbers. Wrap in
+            <div class="r">. Each:
+            <div class="c {cr|hi|me|lo|in}">
+              <span class="v">{NUMBER}</span>
+              <span class="l">{LABEL}</span>
+              <span class="s">{CONTEXT}</span>
+            </div>
+
+            2. MAX 2 VISUALIZATIONS in <div class="ch">:
+
+            DONUT (CSS conic-gradient — for distributions):
+            <div class="cx"><h3>{TITLE}</h3>
+            <div class="dn" style="background:conic-gradient({CLR1} 0% {PCT1}%,{CLR2} {PCT1}% {PCT2}%,{CLR3} {PCT2}% 100%)">
+            <div class="hole"><b>{TOTAL}</b></div>
+            </div>
+            <div class="lg">
+            <span><i style="background:{CLR1}"></i>{LABEL1} ({N1})</span>
+            <span><i style="background:{CLR2}"></i>{LABEL2} ({N2})</span>
+            </div></div>
+            Percentages MUST sum to exactly 100.
+            Colors: #dc2626,#ea580c,#ca8a04,#16a34a,#0078d4,#7c3aed
+
+            GAUGE (SVG — for scores/percentages):
+            <div class="cx"><h3>{LABEL}</h3>
+            <svg viewBox="0 0 200 130" width="200" height="130">
+            <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="#e5e7eb" stroke-width="14" stroke-linecap="round"/>
+            <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="{CLR}" stroke-width="14" stroke-linecap="round" stroke-dasharray="{PCT*2.51},251"/>
+            <text x="100" y="95" text-anchor="middle" font-family="Segoe UI" font-size="28" font-weight="700" fill="{CLR}">{PCT}%</text>
+            </svg></div>
+            Color: 0-39=#dc2626,40-69=#ea580c,70-84=#ca8a04,85-100=#16a34a
+
+            BAR CHART (CSS — for ranked data):
+            <div class="cx"><h3>{TITLE}</h3>
+            <div class="br">
+            <div class="bw">
+              <span class="bl">{FULL NAME — never truncate}</span>
+              <div class="bt"><div class="bf f1"
+              style="width:{PCT_OF_MAX}%">{VALUE}</div></div>
+            </div></div></div>
+            Width = value/max*100. Use f1-f5 for colors.
+
+            3. DETAIL SECTIONS: Map headings to h2. Reproduce
+            all tables exactly. Use .bg-c/.bg-h/.bg-m/.bg-l/.bg-i
+            badges for severity. Wrap CLI in <pre><code>.
+
+            LINKS — MUST generate Azure Portal links for any IDs
+            found in session:
+            Subscription: <a href="https://portal.azure.com/#@/resource/subscriptions/{ID}/overview" target="_blank">{ID}</a>
+            Resource: <a href="https://portal.azure.com/#@/resource{ARM_ID}" target="_blank">{NAME}</a>
+            Policy: <a href="https://portal.azure.com/#blade/Microsoft_Azure_Policy/PolicyDetailBlade/definitionId/%2Fproviders%2FMicrosoft.Authorization%2FpolicyDefinitions%2F{GUID}" target="_blank">{NAME}</a>
+            NEVER fabricate IDs.
+
+            EMOJI — formal status indicators ONLY:
+            Red/orange circle for Critical/High in headings.
+            Check mark for compliant. Warning triangle for alerts.
+            NEVER decorative. NEVER in tables or metric values.
+
+            {{session_content}}
