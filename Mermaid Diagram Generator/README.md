@@ -123,7 +123,7 @@ Download the `MermaidDiagramPluginGC.yaml` file from this repository to your loc
 2. Click **Manage plugins** at the top of the sources panel.
 3. In the plugin management page, click **Add plugin**.
 4. Select **Security Copilot Plugin** as the plugin type.
-5. Choose **Upload a file** and select the `[MermaidDiagramPluginGC.yaml]([url](https://github.com/the-sentinental-guy/YashureSecurity/blob/main/Mermaid%20Diagram%20Generator/Manifest.yaml))` file you downloaded.
+5. Choose **Upload a file** and select the [`MermaidDiagramPluginGC.yaml`](https://github.com/the-sentinental-guy/YashureSecurity/blob/main/Mermaid%20Diagram%20Generator/Manifest.yaml) file you downloaded.
 6. Click **Add** to upload the manifest.
 
 > **Note:** If you see a deployment error like `"Failed to create an instance of type 'System.String'"`, ensure you are using the latest version of the manifest from this repository. Earlier versions had schema issues that have since been fixed.
@@ -157,6 +157,8 @@ Map out the findings as a diagram
 ```
 Diagram the architecture
 ```
+<img width="1482" height="554" alt="image" src="https://github.com/user-attachments/assets/3f6ac0d9-0d11-429a-ab85-417aaffdd3a3" />
+
 
 The orchestrator matches these requests against the plugin's keyword triggers and invokes it automatically.
 
@@ -213,6 +215,8 @@ Open [https://mermaid.live](https://mermaid.live) in your browser.
 
 Your diagram will render **automatically** in the preview panel on the right side.
 
+<img width="1915" height="911" alt="image" src="https://github.com/user-attachments/assets/25441ba9-5fc0-4481-8180-bc580cca7e2d" />
+
 ### Step 3 — Adjust the Layout
 
 For the best visual results, especially for flowcharts:
@@ -222,6 +226,8 @@ For the best visual results, especially for flowcharts:
 3. Switch the renderer to **Elk** for an adaptive layout that spaces nodes evenly and handles complex flows better than the default hierarchical layout.
 
 > **Tip:** The plugin already embeds Elk renderer directives in the generated code (e.g., `%%{init: {"flowchart": {"defaultRenderer": "elk"}} }%%`), so the Elk layout should activate automatically in most cases. If it doesn't, switching manually ensures the best result.
+
+<img width="354" height="100" alt="image" src="https://github.com/user-attachments/assets/c6eaed4d-4bd1-44b2-a4df-d8fca8c24106" />
 
 ### Step 4 — Export the Diagram
 
@@ -233,6 +239,8 @@ From the Mermaid Live Editor, you can export your diagram in multiple formats:
    - **SVG** — Best for high-quality, scalable graphics.
    - **PDF** — Best for formal reports and print.
 3. You can also **share** the diagram using the share functionality in the Actions panel, which generates a shareable link.
+
+<img width="1023" height="677" alt="image" src="https://github.com/user-attachments/assets/4b56e23b-2ea5-4eaa-be78-be66b1222863" />
 
 ---
 
