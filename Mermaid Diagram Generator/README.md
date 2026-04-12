@@ -123,7 +123,7 @@ Download the `MermaidDiagramPluginGC.yaml` file from this repository to your loc
 2. Click **Manage plugins** at the top of the sources panel.
 3. In the plugin management page, click **Add plugin**.
 4. Select **Security Copilot Plugin** as the plugin type.
-5. Choose **Upload a file** and select the `MermaidDiagramPluginGC.yaml` file you downloaded.
+5. Choose **Upload a file** and select the `[MermaidDiagramPluginGC.yaml]([url](https://github.com/the-sentinental-guy/YashureSecurity/blob/main/Mermaid%20Diagram%20Generator/Manifest.yaml))` file you downloaded.
 6. Click **Add** to upload the manifest.
 
 > **Note:** If you see a deployment error like `"Failed to create an instance of type 'System.String'"`, ensure you are using the latest version of the manifest from this repository. Earlier versions had schema issues that have since been fixed.
