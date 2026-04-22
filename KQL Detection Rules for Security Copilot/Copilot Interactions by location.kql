@@ -1,0 +1,19 @@
+let lookback = 30d;
+let CopilotUsage = CopilotActivity
+    | where TimeGenerated >= ago(lookback)
+    | extend UserId = ActorUserId, User = coalesce(ActorName, "Unknown")
+    | project TimeGenerated, UserId, User, ClientRegion;
+let DeviceContext = CloudAppEvents
+    | where TimeGenerated >= ago(lookback)
+    | where isnotempty(AccountObjectId)
+    | summarize arg_max(TimeGenerated, DeviceType, OSPlatform, ISP, CountryCode) by AccountObjectId
+    | project UserId = AccountObjectId,
+        DeviceType = coalesce(DeviceType, "Unknown"),
+        OSPlatform = coalesce(OSPlatform, "Unknown"),
+        Country = coalesce(CountryCode, "Unknown");
+CopilotUsage | join kind=leftouter DeviceContext on UserId
+| summarize CopilotEvents = count(),
+    ActiveUsers = dcount(User),
+    UserNames = make_set(User, 100)
+  by Country, DeviceType, OSPlatform
+| order by CopilotEvents desc
