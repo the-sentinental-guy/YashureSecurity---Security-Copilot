@@ -1,0 +1,43 @@
+let lookback = 30d;
+let IdentityDim =
+    IdentityInfo
+    | summarize arg_max(TimeGenerated, *) by AccountUpn, AccountObjectId
+    | extend
+        UPN = tolower(trim(" ", tostring(AccountUpn))),
+        ObjId = tostring(AccountObjectId),
+        Dept = coalesce(tostring(Department), "Unmapped"),
+        Role = coalesce(tostring(JobTitle), "Unmapped"),
+        DisplayName = AccountDisplayName
+    | project UPN, ObjId, Dept, Role, DisplayName;
+let CopilotBase =
+    CopilotActivity
+    | where TimeGenerated >= ago(lookback)
+    | extend
+        ActorUPN = tolower(trim(" ", tostring(ActorName))),
+        ActorObjId = tostring(ActorUserId)
+    | join kind=leftouter (IdentityDim
+        | project UPN, Dept, Role, DisplayName
+    ) on $left.ActorUPN == $right.UPN
+    | join kind=leftouter (IdentityDim
+        | project ObjId, Dept2 = Dept, Role2 = Role, DisplayName2 = DisplayName
+    ) on $left.ActorObjId == $right.ObjId
+    | extend
+        EnrichedDepartment = coalesce(Dept, Dept2, "Unmapped"),
+        EnrichedJobTitle   = coalesce(Role, Role2, "Unmapped"),
+        EnrichedUser       = coalesce(DisplayName, DisplayName2, ActorUPN)
+    | project TimeGenerated, RecordType, Workload, AppHost, AgentName, ActorUPN, ActorObjId, EnrichedDepartment, EnrichedJobTitle, EnrichedUser;
+CopilotBase
+| summarize
+    CopilotEvents = count(),
+    ActiveUsers   = dcount(EnrichedUser),
+    FirstSeen     = min(TimeGenerated),
+    LastSeen      = max(TimeGenerated)
+  by DimensionType = "Department", Dimension = EnrichedDepartment
+| union (CopilotBase
+| summarize
+        CopilotEvents = count(),
+        ActiveUsers   = dcount(EnrichedUser),
+        FirstSeen     = min(TimeGenerated),
+        LastSeen      = max(TimeGenerated)
+      by DimensionType = "JobTitle", Dimension = EnrichedJobTitle)
+| order by DimensionType asc, CopilotEvents desc, ActiveUsers desc
