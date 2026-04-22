@@ -1,0 +1,22 @@
+let lookback = 7d;
+let window = 2h;
+let SignIns = SigninLogs
+| where TimeGenerated >= ago(lookback)
+| where ResultType == 0
+| extend UPN = tolower(UserPrincipalName),
+    SignInTime = TimeGenerated, SignInIP = IPAddress,
+    SignInCountry = tostring(LocationDetails.countryOrRegion)
+| project UPN, SignInTime, SignInIP, SignInCountry;
+let Copilot = CopilotActivity
+| where TimeGenerated >= ago(lookback)
+| extend UPN = tolower(ActorName), 
+    CopilotTime = TimeGenerated, CopilotIP = tostring(SrcIpAddr)
+| where isnotempty(UPN) and isnotempty(CopilotIP)
+| project UPN, CopilotTime, CopilotIP, AppHost, Workload;
+SignIns | join kind=inner Copilot on UPN
+| where CopilotTime between (SignInTime .. SignInTime + window)
+| where SignInIP != CopilotIP
+| summarize Events = count(), FirstSignIn = min(SignInTime),
+    FirstCopilot = min(CopilotTime), Countries = make_set(SignInCountry),
+    Apps = make_set(AppHost) by UPN, SignInIP, CopilotIP
+| order by Events desc, FirstCopilot desc
