@@ -51,7 +51,9 @@ The **Security Copilot Monitor** agent + plugin pair solves this by providing:
 - **1 Azure Cost Management API skill** that returns real billing data — separating **Provisioned SCU** from **Overage SCU** charges and respecting your tenant's billing currency.
 - **3 GPT analytic skills** that classify adoption maturity, summarize cost data with currency-safe rules, and compile the final monitoring report.
 
-https://github.com/user-attachments/assets/6b7365f6-b1eb-4fe2-9767-90dd2590a290
+## Video Walkthrough
+
+https://github.com/user-attachments/assets/1e7567e0-b5db-4587-9fc7-5e64f881a691
 
 ---
 
