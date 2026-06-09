@@ -53,6 +53,7 @@ The **Security Copilot Monitor** agent + plugin pair solves this by providing:
 
 > 📸 **Screenshot placeholder — landing view of the agent in Security Copilot:**  
 > _Insert screenshot of the Security Copilot Monitor agent tile / suggested starter prompts here._
+> <video src="[https://github.com](https://github.com/the-sentinental-guy/YashureSecurity---Security-Copilot/blob/main/Security%20Copilot%20Monitor/Screenshots/Screen%20Recording%202026-06-09%20at%208.mp4)" width="100%" controls></video>
 
 ---
 
