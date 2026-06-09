@@ -220,20 +220,25 @@ The output is a single markdown response with six sections separated by horizont
 > 📸 **Screenshot placeholder — full Monitoring Summary Dashboard:**  
 > _Insert end-to-end screenshot of the generated dashboard (all 6 sections) here._
 
-> 📸 **Screenshot placeholder — Section 1: Top Active Users table:**  
-> _Insert screenshot of the rendered Top Active Users table here._
+> 📸 **Section 1: Top Active Users table:**
+>   
+> ![Section 1](Screenshots/Section%201.png)
 
-> 📸 **Screenshot placeholder — Section 2: Workspace Usage table:**  
-> _Insert screenshot of the Workspace Usage table here._
+> 📸 **Section 2: Workspace Usage table:**
+>   
+> ![Section 2](Screenshots/Section%202.png)
 
-> 📸 **Screenshot placeholder — Section 3: Plugin & Agent Admin Activity:**  
-> _Insert screenshot of the plugin/agent administration summary here._
+> 📸 **Section 3: Plugin & Agent Admin Activity:**
+>   
+> ![Section 3](Screenshots/Section%203.png)
 
-> 📸 **Screenshot placeholder — Section 4: Usage Anomalies:**  
-> _Insert screenshot of the anomaly detection output (Spike / Drop / Normal classification) here._
+> 📸 **Section 4: Usage Anomalies:**
+>   
+> ![Section 4](Screenshots/Section%204.png)
 
-> 📸 **Screenshot placeholder — Section 5: SCU Cost breakdown (Provisioned vs Overage):**  
-> _Insert screenshot of the cost section showing currency, Provisioned/Overage split, and daily breakdown here._
+> 📸 **Section 5: SCU Cost breakdown (Provisioned vs Overage):**
+>   
+> ![Section 5](Screenshots/Section%205.png)
 
 ---
 
