@@ -217,9 +217,6 @@ The output is a single markdown response with six sections separated by horizont
     2–3 suggested drilldowns, including one cost follow-up
 ```
 
-> 📸 **Screenshot placeholder — full Monitoring Summary Dashboard:**  
-> _Insert end-to-end screenshot of the generated dashboard (all 6 sections) here._
-
 > 📸 **Section 1: Top Active Users table:**
 >   
 > ![Section 1](Screenshots/Section%201.png)
@@ -298,29 +295,13 @@ The output is a single markdown response with six sections separated by horizont
 
 6. **Provide the Azure Subscription ID** — when launching the agent for the first time, supply the GUID of the subscription that holds your Security Copilot billing.
 
-> 📸 **Screenshot placeholder — agent skill resolution view (all child skills resolved against the plugin skillset):**  
-> _Insert screenshot of the agent's child skill resolution / plugin binding here._
+> 📸 **Agent skill resolution view (all child skills resolved against the plugin skillset):**  
+>
+> ![Skills Binding](./Screenshots/Skills%20Binding.png)
 
 ---
 
 ## Usage
-
-Once installed and configured, simply open the **Security Copilot Monitor Agent** standalone agent. It will offer one-click starter prompts and accept natural-language follow-ups.
-
-### Starter Prompts (One-Click)
-
-The agent surfaces five starter prompts directly in the UI:
-
-| Title | Prompt |
-|---|---|
-| **Monitoring Dashboard** | Generate the Security Copilot monitoring summary dashboard. |
-| **Top Users** | Who are the most active Security Copilot users? |
-| **Workspace Usage** | Show workspace-wise Security Copilot usage breakdown. |
-| **Cost Last 30 Days** | How much did we spend on Security Copilot in the last 30 days? |
-| **Overage Cost** | Show Security Copilot overage cost breakdown for the last 30 days. |
-
-> 📸 **Screenshot placeholder — starter prompt tiles inside Security Copilot:**  
-> _Insert screenshot of the starter prompt tiles surfaced by the agent here._
 
 ### Sample Prompts by Scenario
 
@@ -429,9 +410,6 @@ Show usage anomalies and admin activity together.
 ```
 Follow up with Security Copilot cost for the last 30 days.
 ```
-
-> 📸 **Screenshot placeholder — example chat drilldown response (e.g., Cost breakdown):**  
-> _Insert screenshot of a cost-only chat answer with the Provisioned vs Overage split and currency here._
 
 ---
 
