@@ -1,0 +1,593 @@
+Descriptor:
+  Name: SecurityCopilotMonitorPlugin
+  DisplayName: Security Copilot Monitor + Cost
+  Description: >-
+    Monitors Microsoft Security Copilot usage, user adoption, workspace
+    utilization, session metrics, anomaly detection, administrative operations,
+    and SCU billing costs. Uses Defender KQL skills for usage analytics and a
+    direct Azure Management API skill for cost and billing details.
+    Author: Yash Mudaliar
+
+  DescriptionForModel: >-
+    Use this plugin to answer questions about Microsoft Security Copilot usage,
+    adoption, activity, workspaces, sessions, users, prompts, responses,
+    geography, departments, anomalies, and SCU billing costs. For cost, spend,
+    billing, charges, SCU cost, Provisioned SCU, Overage SCU, month-to-date cost,
+    or last-N-days cost prompts, use the QuerySecurityCopilotCost API skill. For
+    usage, adoption, activity, users, sessions, prompts, workspaces, geography,
+    department, anomaly, dashboard, or overview prompts, use the Defender KQL
+    skills. For mixed usage-and-cost prompts, use both DiscoverCopilotActivity
+    and QuerySecurityCopilotCost when the required inputs are available.
+  SupportedAuthTypes:
+    - AADDelegated
+  Authorization:
+    Type: AADDelegated
+    EntraScopes: https://management.azure.com/user_impersonation
+
+SkillGroups:
+
+  - Format: API
+    Settings:
+      OpenApiSpecUrl: https://gist.githubusercontent.com/the-sentinental-guy/7dae6b6b0b6db1d05fd24647ff702a09/raw/1f6687d6e78530369627ff32d4ac64d1a76be4ab/SecurityCopilotCostAPI-OpenAPI-v6.yaml
+
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: DiscoverCopilotActivity
+        DisplayName: Discover Security Copilot activity overview
+        Description: >-
+          Returns total events, interaction events, admin events, unique users,
+          unique sessions, and date range for Security Copilot over the lookback
+          period. Use as the first skill in any monitoring session.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | extend EventData = parse_json(LLMEventData)
+            | extend ThreadId = tostring(EventData.ThreadId)
+            | summarize
+                TotalEvents = count(),
+                InteractionEvents = countif(RecordType == "CopilotInteraction"),
+                AdminEvents = countif(RecordType !in ("CopilotInteraction", "CopilotForSecurityTrigger", "CopilotAgentManagement")),
+                UniqueUsers = dcount(ActorName),
+                UniqueSessions = dcountif(ThreadId, isnotempty(ThreadId)),
+                FirstEvent = min(TimeGenerated),
+                LastEvent = max(TimeGenerated)
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetMostActiveUsers
+        DisplayName: Get most active Security Copilot users
+        Description: >-
+          Ranks users by Security Copilot interaction volume with prompts,
+          responses, sessions, active days, and average prompts per session.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType == "CopilotInteraction"
+            | extend EventData = parse_json(LLMEventData)
+            | extend ThreadId = tostring(EventData.ThreadId)
+            | extend IsPrompt = tobool(parse_json(tostring(EventData.Messages[0])).isPrompt)
+            | summarize
+                TotalInteractions = count(),
+                Prompts = countif(IsPrompt == true),
+                Responses = countif(IsPrompt == false),
+                UniqueSessions = dcount(ThreadId),
+                ActiveDays = dcount(bin(TimeGenerated, 1d)),
+                FirstUsed = min(TimeGenerated),
+                LastUsed = max(TimeGenerated)
+                by ActorName
+            | extend AvgPromptsPerSession = round(todouble(Prompts) / todouble(UniqueSessions), 1)
+            | order by TotalInteractions desc
+            | take 25
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetPeakUsageHours
+        DisplayName: Get peak usage hours for Security Copilot
+        Description: >-
+          Identifies the most active hours of the day for Security Copilot
+          usage with event counts and unique user counts per hour.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType == "CopilotInteraction"
+            | extend HourOfDay = hourofday(TimeGenerated)
+            | summarize
+                EventCount = count(),
+                UniqueUsers = dcount(ActorName)
+                by HourOfDay
+            | order by EventCount desc
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetDayOfWeekUsage
+        DisplayName: Get day-of-week usage pattern
+        Description: >-
+          Shows Security Copilot usage patterns broken down by day of the
+          week with event counts and unique users.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType == "CopilotInteraction"
+            | extend DayOfWeekNum = toint(dayofweek(TimeGenerated) / 1h / 24)
+            | extend DayName = case(
+                DayOfWeekNum == 0, "Sunday",
+                DayOfWeekNum == 1, "Monday",
+                DayOfWeekNum == 2, "Tuesday",
+                DayOfWeekNum == 3, "Wednesday",
+                DayOfWeekNum == 4, "Thursday",
+                DayOfWeekNum == 5, "Friday",
+                DayOfWeekNum == 6, "Saturday",
+                "Unknown")
+            | summarize
+                EventCount = count(),
+                UniqueUsers = dcount(ActorName)
+                by DayName, DayOfWeekNum
+            | order by DayOfWeekNum asc
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetDailyUsageTrend
+        DisplayName: Get daily Security Copilot usage trend
+        Description: >-
+          Shows day-by-day usage trend with daily events, prompts, responses,
+          sessions, and unique users over the lookback period.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType == "CopilotInteraction"
+            | extend EventData = parse_json(LLMEventData)
+            | extend ThreadId = tostring(EventData.ThreadId)
+            | extend IsPrompt = tobool(parse_json(tostring(EventData.Messages[0])).isPrompt)
+            | summarize
+                DailyEvents = count(),
+                DailyPrompts = countif(IsPrompt == true),
+                DailyResponses = countif(IsPrompt == false),
+                DailySessions = dcount(ThreadId),
+                DailyUsers = dcount(ActorName)
+                by Day = bin(TimeGenerated, 1d)
+            | order by Day asc
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetWorkspaceUsage
+        DisplayName: Get workspace-wise Security Copilot utilization
+        Description: >-
+          Shows Security Copilot usage broken down by workspace. Resolves
+          workspace names from plugin CRUD operations and correlates with
+          user interaction data.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            let WorkspaceMap = CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType in ("CreateCopilotPlugin", "DeleteCopilotPlugin", "EnableCopilotPlugin", "DisableCopilotPlugin")
+            | extend EventData = parse_json(LLMEventData)
+            | extend WorkspaceName = tostring(EventData.Workspace.Name)
+            | where isnotempty(WorkspaceName)
+            | summarize
+                AdminEvents = count(),
+                PluginsCreated = countif(RecordType == "CreateCopilotPlugin"),
+                PluginsDeleted = countif(RecordType == "DeleteCopilotPlugin"),
+                PluginsEnabled = countif(RecordType == "EnableCopilotPlugin"),
+                PluginsDisabled = countif(RecordType == "DisableCopilotPlugin")
+                by ActorName, WorkspaceName;
+            let InteractionMap = CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType == "CopilotInteraction"
+            | extend EventData = parse_json(LLMEventData)
+            | extend ThreadId = tostring(EventData.ThreadId)
+            | extend IsPrompt = tobool(parse_json(tostring(EventData.Messages[0])).isPrompt)
+            | summarize
+                Interactions = count(),
+                Prompts = countif(IsPrompt == true),
+                Sessions = dcount(ThreadId)
+                by ActorName;
+            InteractionMap
+            | join kind=leftouter (
+                WorkspaceMap
+                | summarize
+                    AdminEvents = sum(AdminEvents),
+                    PluginsCreated = sum(PluginsCreated),
+                    PluginsDeleted = sum(PluginsDeleted),
+                    PluginsEnabled = sum(PluginsEnabled),
+                    PluginsDisabled = sum(PluginsDisabled),
+                    WorkspaceNames = make_set(WorkspaceName)
+                    by ActorName
+              ) on ActorName
+            | extend WorkspaceLabel = iff(array_length(WorkspaceNames) > 0, tostring(WorkspaceNames[0]), "Unresolved")
+            | summarize
+                TotalInteractions = sum(Interactions),
+                TotalPrompts = sum(Prompts),
+                TotalSessions = sum(Sessions),
+                UniqueUsers = dcount(ActorName),
+                TotalAdminEvents = sum(AdminEvents),
+                TotalPluginsCreated = sum(PluginsCreated),
+                TotalPluginsDeleted = sum(PluginsDeleted)
+                by WorkspaceLabel
+            | order by TotalInteractions desc
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetSessionMetrics
+        DisplayName: Get Security Copilot session duration and depth metrics
+        Description: >-
+          Analyzes session duration and interaction depth with average duration,
+          max duration, average prompts per session, and total counts.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType == "CopilotInteraction"
+            | extend EventData = parse_json(LLMEventData)
+            | extend ThreadId = tostring(EventData.ThreadId)
+            | extend IsPrompt = tobool(parse_json(tostring(EventData.Messages[0])).isPrompt)
+            | where isnotempty(ThreadId)
+            | summarize
+                SessionStart = min(TimeGenerated),
+                SessionEnd = max(TimeGenerated),
+                TotalEvents = count(),
+                Prompts = countif(IsPrompt == true),
+                Responses = countif(IsPrompt == false)
+                by ThreadId, ActorName
+            | extend SessionDurationMinutes = datetime_diff('minute', SessionEnd, SessionStart)
+            | summarize
+                TotalSessions = count(),
+                AvgDurationMinutes = round(avg(SessionDurationMinutes), 1),
+                MaxDurationMinutes = max(SessionDurationMinutes),
+                AvgPromptsPerSession = round(avg(Prompts), 1),
+                AvgResponsesPerSession = round(avg(Responses), 1),
+                TotalPrompts = sum(Prompts),
+                TotalResponses = sum(Responses)
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetPluginAdminActivity
+        DisplayName: Get plugin management activity audit
+        Description: >-
+          Shows all plugin management operations (create, delete, enable,
+          disable) grouped by user and workspace.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType in ("CreateCopilotPlugin", "DeleteCopilotPlugin", "EnableCopilotPlugin", "DisableCopilotPlugin")
+            | extend EventData = parse_json(LLMEventData)
+            | extend WorkspaceName = tostring(EventData.Workspace.Name)
+            | extend ResourceDetail = tostring(EventData.Resource)
+            | summarize
+                TotalActions = count(),
+                Creates = countif(RecordType == "CreateCopilotPlugin"),
+                Deletes = countif(RecordType == "DeleteCopilotPlugin"),
+                Enables = countif(RecordType == "EnableCopilotPlugin"),
+                Disables = countif(RecordType == "DisableCopilotPlugin")
+                by ActorName, WorkspaceName
+            | order by TotalActions desc
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetAgentUsageTracking
+        DisplayName: Track Security Copilot agent activity
+        Description: >-
+          Tracks which Security Copilot agents are active and how frequently
+          they are triggered with agent names, trigger counts, and timeframes.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where RecordType in ("CopilotAgentManagement", "CopilotForSecurityTrigger")
+            | where isnotempty(AgentName)
+            | summarize
+                TriggerCount = count(),
+                FirstSeen = min(TimeGenerated),
+                LastSeen = max(TimeGenerated)
+                by AgentName
+            | order by TriggerCount desc
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetPromptResponseAnalysis
+        DisplayName: Analyze prompt vs response patterns
+        Description: >-
+          Breaks down Security Copilot usage into prompts vs responses per
+          user per session with total sessions, prompts, responses, and
+          average prompts per session.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType == "CopilotInteraction"
+            | extend EventData = parse_json(LLMEventData)
+            | extend IsPrompt = tobool(parse_json(tostring(EventData.Messages[0])).isPrompt)
+            | extend ThreadId = tostring(EventData.ThreadId)
+            | summarize
+                Prompts = countif(IsPrompt == true),
+                Responses = countif(IsPrompt == false)
+                by ActorName, ThreadId
+            | summarize
+                TotalSessions = count(),
+                TotalPrompts = sum(Prompts),
+                TotalResponses = sum(Responses),
+                AvgPromptsPerSession = round(avg(Prompts), 1)
+                by ActorName
+            | order by TotalPrompts desc
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetUserAdoptionCurve
+        DisplayName: Track user adoption over time
+        Description: >-
+          Shows when new users first started using Security Copilot and
+          tracks cumulative user adoption over the lookback period.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType == "CopilotInteraction"
+            | summarize FirstSeen = min(TimeGenerated) by ActorName
+            | summarize NewUsersPerDay = dcount(ActorName) by Day = bin(FirstSeen, 1d)
+            | order by Day asc
+            | extend CumulativeUsers = row_cumsum(NewUsersPerDay)
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: DetectUsageAnomalies
+        DisplayName: Detect usage anomalies and spikes
+        Description: >-
+          Detects unusual usage spikes or drops using Z-score analysis.
+          Days with Z-score above 2.0 are flagged as spikes, below -2.0
+          as drops.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            let DailyStats = CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType == "CopilotInteraction"
+            | summarize DailyEvents = count() by Day = bin(TimeGenerated, 1d);
+            let Baseline = DailyStats | summarize AvgEvents = avg(DailyEvents), StdDevEvents = stdev(DailyEvents);
+            DailyStats
+            | extend dummy = 1
+            | join kind=inner (Baseline | extend dummy = 1) on dummy
+            | project-away dummy, dummy1
+            | extend ZScore = iff(StdDevEvents > 0, round((todouble(DailyEvents) - AvgEvents) / StdDevEvents, 2), 0.0)
+            | extend IsAnomaly = ZScore > 2.0 or ZScore < -2.0
+            | extend AnomalyType = case(
+                ZScore > 2.0, "Spike",
+                ZScore < -2.0, "Drop",
+                "Normal")
+            | order by Day asc
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetWeeklyComparison
+        DisplayName: Compare current week vs previous week
+        Description: >-
+          Compares the current 7-day period against the previous 7-day period
+          for events, users, and sessions with percentage change.
+        Inputs: []
+        Settings:
+          Template: |
+            let CurrentWeek = CopilotActivity
+            | where TimeGenerated > ago(7d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType == "CopilotInteraction"
+            | extend EventData = parse_json(LLMEventData)
+            | extend ThreadId = tostring(EventData.ThreadId)
+            | summarize
+                CW_Events = count(),
+                CW_Users = dcount(ActorName),
+                CW_Sessions = dcount(ThreadId);
+            let PreviousWeek = CopilotActivity
+            | where TimeGenerated between (ago(14d) .. ago(7d))
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | where RecordType == "CopilotInteraction"
+            | extend EventData = parse_json(LLMEventData)
+            | extend ThreadId = tostring(EventData.ThreadId)
+            | summarize
+                PW_Events = count(),
+                PW_Users = dcount(ActorName),
+                PW_Sessions = dcount(ThreadId);
+            CurrentWeek
+            | extend d = 1
+            | join kind=inner (PreviousWeek | extend d = 1) on d
+            | project-away d, d1
+            | extend
+                EventChange = iff(PW_Events > 0, round((todouble(CW_Events) - todouble(PW_Events)) / todouble(PW_Events) * 100, 1), 0.0),
+                UserChange = iff(PW_Users > 0, round((todouble(CW_Users) - todouble(PW_Users)) / todouble(PW_Users) * 100, 1), 0.0),
+                SessionChange = iff(PW_Sessions > 0, round((todouble(CW_Sessions) - todouble(PW_Sessions)) / todouble(PW_Sessions) * 100, 1), 0.0)
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetRecordTypeBreakdown
+        DisplayName: Get activity type distribution
+        Description: >-
+          Shows the distribution of all Security Copilot activity types
+          including CopilotInteraction and plugin management operations.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CopilotActivity
+            | where TimeGenerated > ago({{LookbackDays}}d)
+            | where AppIdentity == "Copilot.Security.SecurityCopilot"
+            | summarize
+                EventCount = count(),
+                UniqueUsers = dcount(ActorName)
+                by RecordType
+            | order by EventCount desc
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetGeoDistribution
+        DisplayName: Get geographic distribution of Security Copilot usage
+        Description: >-
+          Shows where Security Copilot is being accessed from geographically
+          using CloudAppEvents. Returns country codes, cities, ISP information,
+          and user counts.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            CloudAppEvents
+            | where Timestamp > ago({{LookbackDays}}d)
+            | where ActionType == "CopilotInteraction"
+            | where RawEventData has "Copilot.Security.SecurityCopilot"
+            | where isnotempty(City) or isnotempty(CountryCode)
+            | summarize
+                EventCount = count(),
+                UniqueUsers = dcount(AccountObjectId),
+                Cities = make_set(City),
+                ISPs = make_set(ISP)
+                by CountryCode
+            | order by EventCount desc
+
+  - Format: KQL
+    Settings:
+      Target: Defender
+    Skills:
+
+      - Name: GetTeamDeptUsage
+        DisplayName: Get department and team usage breakdown
+        Description: >-
+          Shows Security Copilot usage broken down by department using
+          IdentityInfo from Defender XDR joined with CloudAppEvents.
+          Requires Defender for Identity or Entra ID sync.
+        Inputs:
+          - Name: LookbackDays
+            Required: false
+            DefaultValue: "30"
+        Settings:
+          Template: |
+            let CopilotUsers = CloudAppEvents
+            | where Timestamp > ago({{LookbackDays}}d)
+            | where ActionType == "CopilotInteraction"
+            | where RawEventData has "Copilot.Security.SecurityCopilot"
+            | extend ThreadId = tostring(parse_json(tostring(parse_json(RawEventData).CopilotEventData)).ThreadId)
+            | summarize
+                Sessions = dcount(ThreadId),
+                Events = count()
+                by AccountObjectId, AccountDisplayName;
+            IdentityInfo
+            | where Timestamp > ago(14d)
+            | summarize arg_max(Timestamp, *) by AccountObjectId
+            | project AccountObjectId, Department, JobTitle, Manager
+            | join kind=inner CopilotUsers on AccountObjectId
+            | summarize
+                TotalSessions = sum(Sessions),
+                TotalEvents = sum(Events),
+                UniqueUsers = dcount(AccountObjectId),
+                UserNames = make_set(AccountDisplayName)
+                by Department
+            | order by TotalSessions desc
