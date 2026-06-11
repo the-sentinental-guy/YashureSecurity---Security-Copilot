@@ -5,7 +5,7 @@
 **Custom plugins, KQL skills, and generative tools for Microsoft Security Copilot**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/the-sentinental-guy/YashureSecurity---Security-Copilot?style=flat&color=gold)](https://github.com/the-sentinental-guy/YashureSecurity---Security-Copilot/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/the-sentinental-guy/YashureSecurity---Security-Copilot)](https://github.com/the-sentinental-guy/YashureSecurity---Security-Copilot/stargazers)
 [![Medium](https://img.shields.io/badge/Blog-@yashuresecurity-black?logo=medium&logoColor=white)](https://medium.com/@yashuresecurity)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Yash-0077B5?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/yashmudaliar/)
 [![Microsoft Security Copilot](https://img.shields.io/badge/Microsoft-Security%20Copilot-0078D4?logo=microsoft&logoColor=white)](https://learn.microsoft.com/en-us/security-copilot/)
