@@ -1,19 +1,4 @@
-# Security Copilot Cost Management API V17.
-#
-# V17 removes OpenAPI path parameters entirely. The agent dispatcher bug
-# documented in V13-V17 only occurs while substituting URL-template path
-# variables, so this spec calls the static ARM batch endpoint and places the
-# subscription-scoped Cost Management request in the JSON body.
-#
-# V18 evidence showed the planner attempted to pass the body field `requests`
-# as a top-level tool argument. Security Copilot API skills expose HTTP bodies
-# to the model as one tool input named `requestBody`, so V17 says this
-# explicitly in the operation description.
-#
-# V19 evidence showed the pathless ARM batch + requestBody plumbing works, but
-# MonthToDate returned zero rows early in July while a Custom rolling 30-day
-# Cost Management query returned billing rows. V17 therefore exposes only a
-# Custom rolling-window request shape with required timePeriod.
+# Security Copilot Cost Management API.
 #
 # Runtime request shape:
 # POST https://management.azure.com/batch?api-version=2020-06-01
@@ -26,14 +11,10 @@
 #     }
 #   ]
 # }
-#
-# This is intentionally a new experiment. It preserves the strict inline
-# Cost Management body that worked in direct dispatch while bypassing the
-# broken agent path-substitution code path.
 
 openapi: 3.0.0
 info:
-  title: Security Copilot Cost Management API V17 ARM Batch Rolling 30 Days
+  title: Security Copilot Cost Management API ARM Batch Rolling 30 Days
   description: >
     Queries compact Microsoft Security Copilot cost for a Custom rolling
     window through the static Azure Resource Manager batch endpoint. The Azure
@@ -47,7 +28,7 @@ servers:
 paths:
   /batch:
     post:
-      operationId: QuerySecurityCopilotCostCustomViaArmBatchV17
+      operationId: QuerySecurityCopilotCostCustomViaArmBatch
       summary: Query Custom-window Security Copilot cost through ARM batch.
       description: >
         Use this operation for agent runs that need Microsoft Security Copilot
