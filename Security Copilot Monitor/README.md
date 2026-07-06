@@ -144,7 +144,7 @@ The manifest is configured for on-demand use by default. Administrators can enab
 
 | File | Purpose |
 |---|---|
-| `SecurityCopilotMonitor - Agent.yaml` | The public-ready combined Security Copilot Monitor agent manifest. |
+| [SecurityCopilotMonitor - Agent.yaml](./SecurityCopilotMonitor%20-%20Agent.yaml) | The public-ready combined Security Copilot Monitor agent manifest. |
 | Hosted Cost Management OpenAPI definition | The read-only Azure Cost Management API definition referenced by the manifest. |
 
 The user-facing agent identity is:
@@ -203,12 +203,6 @@ Before importing the agent, confirm these items are in place.
 5. Start the agent and provide the Azure subscription GUID in `TargetSubscription`.
 
 6. Run the default dashboard prompt or one of the prompts below.
-
-> 📸 **Import screenshot placeholder**  
-> Add a screenshot of the custom agent import screen here.
-
-> 📸 **Agent details screenshot placeholder**  
-> Add a screenshot showing the imported `Security Copilot Monitor` agent and its on-demand trigger state.
 
 ---
 
@@ -352,9 +346,6 @@ Daily Cost Ledger
 |---|---:|---:|
 | 2026-06-07 | 798.85 INR | 1.60 |
 ```
-
-> 📸 **Example output screenshot placeholder**  
-> Add an anonymized sample dashboard screenshot here.
 
 ---
 
