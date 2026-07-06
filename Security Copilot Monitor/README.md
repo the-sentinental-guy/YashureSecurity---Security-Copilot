@@ -145,7 +145,7 @@ The manifest is configured for on-demand use by default. Administrators can enab
 | File | Purpose |
 |---|---|
 | [SecurityCopilotMonitor - Agent.yaml](./SecurityCopilotMonitor%20-%20Agent.yaml) | The public-ready combined Security Copilot Monitor agent manifest. |
-| Hosted Cost Management OpenAPI definition | The read-only Azure Cost Management API definition referenced by the manifest. |
+| [Hosted Cost Management OpenAPI definition](./SecurityCopilotCostAPI-OpenAPI.yaml) | The read-only Azure Cost Management API definition referenced by the manifest. |
 
 The user-facing agent identity is:
 
