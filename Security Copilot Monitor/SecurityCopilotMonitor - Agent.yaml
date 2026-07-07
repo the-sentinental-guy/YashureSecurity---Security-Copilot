@@ -25,7 +25,7 @@ Descriptor:
 
     A subscription GUID in a dashboard prompt is the Azure billing scope for
     cost, not a Defender KQL filter. When a dashboard request contains a
-    subscription GUID, also call QuerySecurityCopilotCostCustomViaArmBatchV17
+    subscription GUID, also call QuerySecurityCopilotCostCustomViaArmBatch
     for Custom rolling last-30-day cost. Use api-version 2020-06-01 on
     /batch. The API tool has one body input named requestBody. Put the runtime
     GUID into
