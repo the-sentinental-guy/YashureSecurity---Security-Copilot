@@ -154,7 +154,7 @@ CLI commands, KQL queries, Azure CLI scripts, and remediation commands are rende
 
 ### Step 1 — Download the Manifest
 
-Download the `HTMLDashboardGeneratorV2.yaml` file from this repository to your local machine.
+Download the [`HTMLDashboardGeneratorV2.yaml`](./Manifest.yaml) file from this repository to your local machine.
 
 ### Step 2 — Open Security Copilot
 
