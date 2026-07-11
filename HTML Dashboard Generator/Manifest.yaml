@@ -68,11 +68,20 @@ SkillGroups:
                charts, investigation flow diagrams, or any diagram
                syntax. This dashboard is for DATA presentation only.
                A separate plugin handles diagrams.
-            8. MAX 2 visualizations total. Choose the 2 most
-               impactful charts. Put everything else in tables.
-            9. Every visualization must be COMPLETE — no partial
-               arcs, missing segments, or cut-off charts. Verify
-               all percentages sum correctly before outputting.
+            8. 2 to 4 visualizations total. Every chart must
+               encode at least 2 distinct non-zero values. A
+               chart of a single number — one donut segment, one
+               bar, one category at ~100% — is FORBIDDEN. A
+               single number belongs in a metric card, never in
+               a chart.
+            9. Every visualization must be COMPLETE and
+               CONTAINED — no partial arcs, missing segments,
+               cut-off charts, or text overflowing its container.
+               Verify all percentages sum to exactly 100 before
+               outputting.
+            10. Charts SUPPLEMENT tables, never replace them.
+               After charting a table's data, still reproduce
+               the full table in its detail section.
 
             COPY THIS HTML SKELETON EXACTLY:
 
@@ -101,9 +110,10 @@ SkillGroups:
             .ch{display:flex;flex-wrap:wrap;gap:24px;margin-bottom:28px}
             .cx{background:#f8f9fc;border:1px solid #e2e6ee;border-radius:10px;padding:24px;flex:1;min-width:280px}
             .cx h3{font-size:13px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.3px;margin-bottom:14px}
-            .dn{width:140px;height:140px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto}
-            .dn .hole{width:80px;height:80px;border-radius:50%;background:#f8f9fc;display:flex;align-items:center;justify-content:center;flex-direction:column}
-            .dn .hole b{font-size:22px;font-weight:700;color:#1b1f3b}
+            .dn{width:150px;height:150px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto}
+            .dn .hole{width:96px;height:96px;border-radius:50%;background:#f8f9fc;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;padding:0 8px;text-align:center}
+            .dn .hole b{font-size:20px;font-weight:700;color:#1b1f3b;max-width:100%}
+            .dn .hole b.sm{font-size:12px;line-height:1.2;word-break:break-word}
             .dn .hole span{font-size:9px;color:#6b7280}
             .lg{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
             .lg span{font-size:11px;color:#374151;display:flex;align-items:center;gap:5px}
@@ -114,6 +124,12 @@ SkillGroups:
             .bw .bt{flex:1;height:20px;background:#e5e7eb;border-radius:4px;overflow:hidden}
             .bw .bf{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:600;color:#fff}
             .f1{background:#dc2626}.f2{background:#ea580c}.f3{background:#ca8a04}.f4{background:#16a34a}.f5{background:#0078d4}
+            .bw .bv{font-size:10px;font-weight:600;color:#374151;align-self:center;margin-left:6px;white-space:nowrap}
+            .cl{display:flex;align-items:flex-end;gap:8px;margin-top:6px}
+            .co{flex:1;text-align:center;min-width:0}
+            .cv{display:block;font-size:10px;font-weight:600;color:#374151;margin-bottom:3px;white-space:nowrap}
+            .cb{max-width:36px;margin:0 auto;background:#0078d4;border-radius:3px 3px 0 0}
+            .cd{display:block;font-size:9px;color:#6b7280;margin-top:5px;line-height:1.2;word-break:break-word}
             h2{font-size:17px;font-weight:600;color:#1b1f3b;margin:24px 0 12px;padding-bottom:7px;border-bottom:2px solid #e5e7eb}
             h3{font-size:14px;font-weight:600;color:#374151;margin:18px 0 8px}
             p,li{font-size:13px;color:#374151;line-height:1.7}
@@ -159,18 +175,41 @@ SkillGroups:
               <span class="s">{CONTEXT}</span>
             </div>
 
-            2. MAX 2 VISUALIZATIONS in <div class="ch">:
+            2. VISUALIZATIONS (2-4) in <div class="ch">:
 
-            DONUT (CSS conic-gradient — for distributions):
+            CHART SELECTION — scan EVERY table, list, and metric
+            in the session for numeric data, then chart the 2-4
+            most insightful sets using this mapping:
+            - Parts of a whole, 2-6 categories, each >0 and
+              none >=90% → DONUT
+            - Comparing counts across named items (action types,
+              users, agents, severities, resources) → BAR
+            - Values across dates or times → COLUMN
+            - A single 0-100 score or percentage → GAUGE
+            - Only one category, or one category at ~100%, or a
+              lone total → NO CHART: it is already a metric card.
+            Prefer charting table/list data the reader would
+            otherwise compare row by row (per-type action counts,
+            per-day costs, per-agent triggers, per-user activity)
+            over repeating headline numbers that already appear
+            in metric cards. Never chart the same value twice.
+
+            DONUT (CSS conic-gradient — parts of a whole,
+            >=2 non-zero segments REQUIRED):
             <div class="cx"><h3>{TITLE}</h3>
             <div class="dn" style="background:conic-gradient({CLR1} 0% {PCT1}%,{CLR2} {PCT1}% {PCT2}%,{CLR3} {PCT2}% 100%)">
-            <div class="hole"><b>{TOTAL}</b></div>
+            <div class="hole"><b>{CENTER}</b><span>{UNIT}</span></div>
             </div>
             <div class="lg">
-            <span><i style="background:{CLR1}"></i>{LABEL1} ({N1})</span>
-            <span><i style="background:{CLR2}"></i>{LABEL2} ({N2})</span>
+            <span><i style="background:{CLR1}"></i>{LABEL1} ({N1} · {PCT1}%)</span>
+            <span><i style="background:{CLR2}"></i>{LABEL2} ({N2} · {PCT2}%)</span>
             </div></div>
             Percentages MUST sum to exactly 100.
+            {CENTER} must fit the hole: max 6 characters. If the
+            value needs 7+ characters (currency, decimals), add
+            class="sm" to the <b> — or better, show the item
+            COUNT in the hole and leave the long value to a
+            metric card. Never let text escape the hole.
             Colors: #dc2626,#ea580c,#ca8a04,#16a34a,#0078d4,#7c3aed
 
             GAUGE (SVG — for scores/percentages):
@@ -182,15 +221,40 @@ SkillGroups:
             </svg></div>
             Color: 0-39=#dc2626,40-69=#ea580c,70-84=#ca8a04,85-100=#16a34a
 
-            BAR CHART (CSS — for ranked data):
+            BAR CHART (CSS — comparing named items):
             <div class="cx"><h3>{TITLE}</h3>
             <div class="br">
             <div class="bw">
               <span class="bl">{FULL NAME — never truncate}</span>
-              <div class="bt"><div class="bf f1"
+              <div class="bt"><div class="bf f5"
               style="width:{PCT_OF_MAX}%">{VALUE}</div></div>
             </div></div></div>
-            Width = value/max*100. Use f1-f5 for colors.
+            One .bw row per item, sorted descending by value.
+            Width = value/max*100, minimum 2.
+            If width < 15, the value will not fit inside the
+            bar: leave the .bf empty and place
+            <span class="bv">{VALUE}</span> after the .bt
+            instead. Never clip a value label.
+            COLOR: use ONE color (f5) for all bars of ordinary
+            items. Use f1/f2/f3/f4 ONLY when rows ARE severity
+            levels (Critical/High/Medium/Low) — never color by
+            rank or size.
+
+            COLUMN CHART (CSS — values over dates or times):
+            <div class="cx"><h3>{TITLE}</h3>
+            <div class="cl">
+            <div class="co">
+              <span class="cv">{VALUE}</span>
+              <div class="cb" style="height:{H}px"></div>
+              <span class="cd">{DATE}</span>
+            </div>
+            </div></div>
+            One .co per data point, in chronological order.
+            H = value/max*110, minimum 4. Max 12 columns — for
+            longer series keep the 12 most recent points and say
+            so in the title. If more than 8 columns, shorten
+            {DATE} to MM-DD and {VALUE} to a compact form
+            (e.g. 1.8k) so labels never collide.
 
             3. DETAIL SECTIONS: Map headings to h2. Reproduce
             all tables exactly. Use .bg-c/.bg-h/.bg-m/.bg-l/.bg-i
