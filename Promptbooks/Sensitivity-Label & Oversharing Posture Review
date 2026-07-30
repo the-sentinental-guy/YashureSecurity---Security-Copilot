@@ -1,5 +1,9 @@
 For the sensitivity label <SensitivityLabelOrGUID>, summarize protection posture over <Timeframe>: volume of items carrying this label, how many are protected vs unprotected, and where they reside. Note: audit telemetry references labels by GUID; if a GUID is supplied, resolve it to the display name where possible and report both.
+
 Identify oversharing exposure for data carrying <SensitivityLabelOrGUID>: items shared broadly (org-wide / external / anonymous links) and any recent label downgrades or removals. Present as a table ordered by exposure severity.
+
 List DLP and Information Protection activity involving <SensitivityLabelOrGUID> over <Timeframe>: policy matches, blocked actions, and overrides. Show which users and locations are involved.
+
 Flag the highest-risk gaps: unprotected sensitive items in high-exposure locations, and users repeatedly downgrading/removing this label. Order by risk.
+
 Generate a data-protection posture report: coverage percentage for <SensitivityLabelOrGUID>, top exposure gaps, notable label-downgrade behavior, and 3–5 recommended actions (auto-labeling, DLP rule, restrict sharing, targeted user education). Audience: data security leadership. Under 250 words.
