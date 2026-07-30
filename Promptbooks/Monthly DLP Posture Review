@@ -1,0 +1,5 @@
+Show me the top 10 high-severity Microsoft Purview DLP alerts from <Timeframe>. Present as a table: Alert ID, Policy, Severity, User, Affected file/location, Timestamp.
+Summarize the DLP alert landscape for <Timeframe>: which DLP policies triggered most, which locations (Exchange, SharePoint, OneDrive, Teams, Endpoint) are hottest, and the trend versus the prior period.
+Identify repeat offenders: users associated with more than one high-severity DLP alert in <Timeframe>. For each, show user UPN, alert count, and the policies involved, ordered by alert count descending.
+For the single highest-severity alert, summarize what actions were performed on the affected item (access, download, share, label change) and the data-risk profile of the user involved.
+Generate a monthly DLP posture report for the data security lead: alert volume and trend, top policies and locations, repeat offenders, and 3–5 specific policy-tuning recommendations (e.g., tighten a noisy rule, add a location, escalate a repeat offender to Insider Risk Management). Audience: security management. Under 250 words.
