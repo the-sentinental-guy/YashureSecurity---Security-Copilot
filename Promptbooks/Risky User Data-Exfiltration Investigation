@@ -1,5 +1,9 @@
 Summarize the insider-risk profile for user <UserUPN>: current risk level, active risk indicators, open alerts or policy matches, and risk-score trend over <Timeframe>.
+
 Provide a detailed summary of all data activity by <UserUPN> over <Timeframe>: file access, downloads, uploads, sharing events, email attachments, sensitivity-label interactions, and any DLP policy triggers. Present as a table ordered by Timestamp.
+
 Show the exfiltration activities and any sequential (staged) activities for <UserUPN> over <Timeframe> — e.g., downgrade/remove label then export, bulk download then external share. Highlight the highest-risk sequences.
+
 Correlate <UserUPN>'s activity with related DLP and Defender alerts in <Timeframe>. List each related alert with severity and how it connects to the observed behavior.
+
 Generate an insider-risk triage summary for <UserUPN>: a verdict of Low/Medium/High/Critical with justification, the key risky sequences, and specific recommended actions (further investigation, containment, HR/Legal escalation triggers, or policy tuning). Under 250 words.
